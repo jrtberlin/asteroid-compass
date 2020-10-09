@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QtQuick 2.5
+import QtQuick 2.9
 import org.asteroid.controls 1.0
 import QtSensors 5.3
 
@@ -28,12 +28,19 @@ Application {
 
     property int rotation: 0;
     property int calibration: 0;
+    property bool calibrated: false;
 
     Compass {
         active: true
         onReadingChanged: {
             app.rotation = reading.azimuth;
             app.calibration = reading.calibrationLevel;
+            if (app.calibration === 0) {
+                app.calibrated = false;
+            } else {
+                app.calibrated = true;
+            }
+            calibrationInfo.visible = !app.calibrated;
         }
     }
 
@@ -53,6 +60,17 @@ Application {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: Dims.l(7)
         font.pixelSize: Dims.l(5)
-        text: app.rotation + " °N Calibrated: " + app.calibration
+        text: app.rotation + " °N"
     }
+
+    Label {
+        id: calibrationInfo
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.top: parent.top
+        anchors.topMargin: Dims.l(7)
+        font.pixelSize: Dims.l(5)
+        //% "Calibrate with ∞-figure"
+	text: qsTrId("calibration-text")
+    }
+
 }
